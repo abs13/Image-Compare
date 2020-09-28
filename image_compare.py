@@ -51,6 +51,15 @@ def initializeOutfile(outcsvfile):
         print()
         exc_type, exc_value, exc_tb = sys.exc_info()
         pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
+        exit(2)
+    except IOError as ioerr:
+        print(ioerr)
+        print()
+        
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
+        exit(2)
+        
 
     else:
         writehandle = csv.writer(outputfile)
@@ -78,6 +87,14 @@ def checkArgs():
    
     initializeOutfile(outcsvfile)
     processCompare(csvtoread,outcsvfile)
+
+def permissionErr():
+    #print()
+    print()
+    print ("******************Check permissions and retry******************")
+    print()
+    exc_type, exc_value, exc_tb = sys.exc_info()
+    pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
 def processCompare(csvtoread,outcsvfile):
     # Read the input file by line and run a loop for each line capturing paths of image1 and image2
     import timeit
@@ -86,10 +103,8 @@ def processCompare(csvtoread,outcsvfile):
             my_input_cvs=open(csvtoread, 'r')
             
         except PermissionError as permissionerr:
-            print(permissionerr)
-            print()
-            print ("******************Check permissions and retry******************")
-            print()
+            permissionErr(permissionerr)
+            
         else:
             with my_input_cvs:    
                 csvcontent = csv.reader(my_input_cvs)
@@ -107,15 +122,13 @@ def processCompare(csvtoread,outcsvfile):
                         execCost = timeit.timeit(stmt=functools.partial(getimagehash, img1, img2), number=1)
                         try:
                             outputfile = open(outcsvfile , 'a')
-                        except PermissionError as permissionerr:
-                            print(permissionerr)
-                            print()
-                            print ("******************Premission Denied to create file in the specified output location******************")
-                            print ("******************Check permissions and retry******************")
+                        except IOError as ioerr:
+                            print(ioerr)
                             print()
                             exc_type, exc_value, exc_tb = sys.exc_info()
                             pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
-
+                            exit(2)
+    
                         else:    
                             writehandle = csv.writer(outputfile)
                             writehandle.writerow([img1,img2,myhashdiff,execCost])
