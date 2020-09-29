@@ -1,0 +1,5 @@
+Image1,Image2
+/opt/image_compare/images/London2.png,/opt/image_compare/images/London1.jpg,
+
+/opt/image_compare/images/London1_BlownHglts.jpg,/opt/image_compare/images/London1.jpg
+/opt/image_compare/images/WinterWonderland_blownhioglights.jpg,/opt/image_compare/images/Winterwonderland_crushed_shadows.jpg
