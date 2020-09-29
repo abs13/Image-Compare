@@ -111,38 +111,41 @@ def processCompare(csvtoread,outcsvfile):
                 next(csvcontent, None)  # skip the headers
                 itr_var = 1
                 for line in csvcontent:
-                    itr_var = itr_var + 1 
-                    img1 = line[1]
-                    img2 = line[2]
-                    #check if the paths defined for image1 and image2 exist on the filesystem
-                    if path.exists(img1) and path.exists(img2):
-                        #call the imagehash calculater function to calculate the hashdiff of image1 and image2
-                        myhashdiff = getimagehash(img1, img2)
-                        #calculate time taken to calculate each hash by above function
-                        execCost = timeit.timeit(stmt=functools.partial(getimagehash, img1, img2), number=1)
-                        try:
-                            outputfile = open(outcsvfile , 'a')
-                        except IOError as ioerr:
-                            print(ioerr)
-                            print()
-                            exc_type, exc_value, exc_tb = sys.exc_info()
-                            pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
-                            exit(2)
+                    if not line:
+                        break
+                    else:
+                        itr_var = itr_var + 1 
+                        img1 = line[0]
+                        img2 = line[1]
+                        #check if the paths defined for image1 and image2 exist on the filesystem
+                        if path.exists(img1) and path.exists(img2):
+                            #call the imagehash calculater function to calculate the hashdiff of image1 and image2
+                            myhashdiff = getimagehash(img1, img2)
+                            #calculate time taken to calculate each hash by above function
+                            execCost = timeit.timeit(stmt=functools.partial(getimagehash, img1, img2), number=1)
+                            try:
+                                outputfile = open(outcsvfile , 'a')
+                            except IOError as ioerr:
+                                print(ioerr)
+                                print()
+                                exc_type, exc_value, exc_tb = sys.exc_info()
+                                pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
+                                exit(2)
     
-                        else:    
-                            writehandle = csv.writer(outputfile)
-                            writehandle.writerow([img1,img2,myhashdiff,execCost])
-                            outputfile.close()
-                    elif path.exists(img1) == False and path.exists(img2):
-                        print (img1 + " not a valid path on row " + str(itr_var) )
-                        print ("Skipping row " + str(itr_var))
-                    elif path.exists(img1) and path.exists(img2) == False:
-                        print (img2 + " not a valid path on row " + str(itr_var))
-                        print ("Skipping row " + str(itr_var))
+                            else:    
+                                writehandle = csv.writer(outputfile)
+                                writehandle.writerow([img1,img2,myhashdiff,execCost])
+                                outputfile.close()
+                        elif path.exists(img1) == False and path.exists(img2):
+                            print (img1 + " not a valid path on row " + str(itr_var) )
+                            print ("Skipping row " + str(itr_var))
+                        elif path.exists(img1) and path.exists(img2) == False:
+                            print (img2 + " not a valid path on row " + str(itr_var))
+                            print ("Skipping row " + str(itr_var))
 
-                    elif path.exists(img1) ==False and path.exists(img2) == False:
-                        print (img2 + "and" + img2 + " not a valid path on row " + str(itr_var))
-                        print ("Skipping row " + str(itr_var))
+                        elif path.exists(img1) ==False and path.exists(img2) == False:
+                            print (img2 + "and" + img2 + " not a valid path on row " + str(itr_var))
+                            print ("Skipping row " + str(itr_var))
     else:
         print("Input CVS file " + csvtoread + 'does not exist.' )
         print("Please check path specified and try again")
