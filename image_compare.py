@@ -112,7 +112,7 @@ def processCompare(csvtoread,outcsvfile):
                 itr_var = 1
                 for line in csvcontent:
                     if not line:
-                        break
+                        print()
                     else:
                         itr_var = itr_var + 1 
                         img1 = line[0]
