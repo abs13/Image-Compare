@@ -112,8 +112,8 @@ def processCompare(csvtoread,outcsvfile):
                 itr_var = 1
                 for line in csvcontent:
                     itr_var = itr_var + 1 
-                    img1 = line[0]
-                    img2 = line[1]
+                    img1 = line[1]
+                    img2 = line[2]
                     #check if the paths defined for image1 and image2 exist on the filesystem
                     if path.exists(img1) and path.exists(img2):
                         #call the imagehash calculater function to calculate the hashdiff of image1 and image2
