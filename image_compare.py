@@ -193,7 +193,7 @@ def processCompare(csvtoread,outcsvfile):
                             print ("Skipping row " + str(itr_var))
 
                         elif path.isfile(img1) ==False and path.isfile(img2) == False:
-                            print (img2 + " and " + img2 + " not a valid path on row " + str(itr_var))
+                            print (img1 + " and " + img2 + " not a valid path on row " + str(itr_var))
                             print ("Skipping row " + str(itr_var))
     else:
         print("Input CVS file " + csvtoread + 'does not exist.' ) # If input csv path does not exist, inform the user.

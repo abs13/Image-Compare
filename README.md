@@ -1,6 +1,8 @@
 # Image-Comapre
 
 Image comapre is a python script that reads a input csv file and can compares two images provided on each row. 
+The utility uses [imagehash](https://pypi.org/project/ImageHash/) module for core image comparison.
+The algorithm used was *dhash*
 
 ## Platform Support
 The utility can run on both Windows 10 and linux. 
@@ -26,46 +28,57 @@ Module dependencies are  bundled together in requirments.txt
 ## Usage
 
 ### Linux
+Executable: [image_compare](./dist/linux/image_compare)
 #### Using exe:
 Display usage help:
 
 ```bash
    ./image_compare -h
 ```
+![linux_help](./resources/linux_help.png)
 Display the version information:
 ```bash 
     ./image_compare -v
 ```
+![linux_help_version](./resources/linux_version.png)
 Process image comparison :
 ```bash
  ./image_comapre -i <input csv file> -o <output csv file> *(Optional)
 ```
+![linux_execute](./resources/linux_execute.png)
 #### using python script:
 ```bash
    python image_compare.py -h
 ```
+
 Display the version information:
 ```bash 
     python image_compare.py -v
 ```
+
 Process image comparison :
 ```bash
  python image_compare.py -i <input csv file> -o <output csv file> *(Optional)
 ```
 ### Windows
+Esecutable: [Windows](./dist/windows/image_compare.exe)
 #### using exe:
 Display usage help:
 ``` dos
 image_compare -h
 ```
+![windows_help](./resources/windows_help.png)
 Display utility version:
 ```dos
 image_compare -v
 ```
+![windows_help_VERSION](./resources/windows_version.png)
 Prcoess image comparison:
 ```dos
 image_compare -i <input csv file> -o <output csv file> *Optional*
 ```
+![windows_help_exec](./resources/windows_execution.png)
+
 #### using python script:
 ```dos
    python image_compare.py -h
@@ -82,7 +95,11 @@ Process image comparison :
 
 > In absence of -o argument, default location *pwd* is used with default filename as output.csv 
 
+## Developer Documentation
+Developer documentation is availale at
+
+[documentation](./html/image_compare.html)
+
 ## Contributing
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
