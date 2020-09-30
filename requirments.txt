@@ -1,0 +1,4 @@
+##With Version
+pip == 20.2.3
+imagehash == 4.1.0
+Pillow == 7.2.0
