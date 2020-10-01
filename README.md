@@ -23,7 +23,7 @@ The utility has been tested on windows 10.
 ##### macOS :
 macOS support has been tested on Mojave and Catalina . The distribution has been code-signed using self generated certificates.
 [macOS](dirs/../dist/mac/image_compare)
-## Run as Python script
+### Run as Python script
 To use the utility as a python script, follow the instructions below.
 ### Pre-requisites:
 1. Python 3.5 or greater
