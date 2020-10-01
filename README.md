@@ -105,7 +105,7 @@ Process image comparison :
 ## Developer Documentation
 Developer documentation is availale at
 
-[documentation]( https://htmlpreview.github.io/?/html/image_compare.html)
+[documentation]( https://htmlpreview.github.io/?https://github.com/abs13/Image-Compare/blob/master/html/image_compare.htmll)
 
 ## Contributing
 
