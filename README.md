@@ -36,7 +36,7 @@ To use the utility as a python script, follow the instructions below.
 #### Install python module dependencies using pip:
 Module dependencies are  bundled together in [requirments.txt](requirments.txt) and can be installed using 
 ```python
-        pip install -r requirments.txt
+       python3 -m pip install -r requirments.txt
 ```
 #### Input parametes and Output file
 Requires input csv file
