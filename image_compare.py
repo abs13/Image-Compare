@@ -80,7 +80,7 @@ def getimagehash(image1path,image2path):
     '''
         Function to compare images. 
 
-        uses dhash as the hashing method
+        uses phash as the hashing method
 
             parameters:
                 a (str) : path to image 1
@@ -97,9 +97,9 @@ def getimagehash(image1path,image2path):
     myimghash2 = imagehash.phash(Image.open(image2path))
     myhashdiff = myimghash1 - myimghash2
    # print(myhashdiff)
-    return (myhashdiff) #return the difference between the dhashes of two input images
-def cleanupEmpty():
-    print('dummy')
+    return (myhashdiff) #return the Hammer difference between the phash of two input images
+#def cleanupEmpty():
+#    print('dummy')
 
 def main(): #Function to generate the menu for the utility
     '''
@@ -233,7 +233,7 @@ def processCompare(csvtoread,outcsvfile,verbosity):
                                 print ("Skipping row " + str(itr_var))
             finally:
                 outputfile.close()
-                cleanupEmpty()
+                #cleanupEmpty()
         elif path.isfile(csvtoread) and path.getsize(csvtoread) == 0:
             raise Exception('Input csv empty. Exiting....')
             exit()
