@@ -6,6 +6,7 @@ import csv
 import traceback
 from pprint import pprint
 import errno
+import pathlib
 
 def getOSType():
     '''
@@ -40,7 +41,7 @@ def backuponRerun(outcsvfile,verbosity):
                 : Nothing
     '''
     import datetime #import datetime. This will be used to create a backup of the output file in case older output dile exists.
-    import pathlib  #Import pathlib to handle paths and create backups of folders
+    #import pathlib  #Import pathlib to handle paths and create backups of folders
     suffx_var = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S") # Calculate the suffix to append to old output file. Format is YYYY_MM_DD_H_M_S
     #open output file and insert the header into it
     if path.exists(outcsvfile):
@@ -91,9 +92,11 @@ def getimagehash(image1path,image2path):
     from PIL import Image
     import imagehash 
     #print(imagehash.__doc__)   
-    myimghash1 = imagehash.dhash(Image.open(image1path,))
-    myimghash2 = imagehash.dhash(Image.open(image2path))
+    myimghash1 = imagehash.phash(Image.open(image1path,))
+    
+    myimghash2 = imagehash.phash(Image.open(image2path))
     myhashdiff = myimghash1 - myimghash2
+   # print(myhashdiff)
     return (myhashdiff) #return the difference between the dhashes of two input images
 def cleanupEmpty():
     print('dummy')
@@ -120,13 +123,16 @@ def main(): #Function to generate the menu for the utility
     parser = argparse.ArgumentParser(prog='image_compare',description="Use this to compare images") #initate the parser
     parser.version = "1.0" # Set version as 1.0. this can be displayed using the -v optional paramater
     parser.add_argument('-i',action="store",dest='input_file',help="Input csv containig paths of images to compare", required=True) #define a required param, to capture the input csv file
-    parser.add_argument('-o',action="store", dest="output_file",type=str,default='output.csv') #define an option parameter for output file
+    parser.add_argument('-o',action="store", dest="output_file",type=str,default='dflt_val') #define an option parameter for output file
     parser.add_argument('--verbose',action="store_true") #define a version param
 
     parser.add_argument('-v',action="version",) #define a version param
     my_arguments=parser.parse_args()
     csvtoread = my_arguments.input_file
     outcsvfile = my_arguments.output_file
+    if outcsvfile == 'dflt_val':
+        outcsvfile = (pathlib.Path(csvtoread).stem + "_results.csv")
+        
     verbosity = my_arguments.verbose 
    
     backuponRerun(outcsvfile,verbosity) #call the fuction to initialize the output file. the called function only adds a header here
@@ -145,6 +151,7 @@ def processCompare(csvtoread,outcsvfile,verbosity):
     '''
     import timeit
     my_platform = getOSType() # get the OS type
+
     try:
         outputfile = open(outcsvfile , 'a') # check if output file can be opened for inserting new records ( in append mode )
         headernames = ['Image1','Image2','Similar','Elapsed']
@@ -201,9 +208,9 @@ def processCompare(csvtoread,outcsvfile,verbosity):
                         else: #else continue processing
                             itr_var = itr_var + 1  
                             img1 = line[0] #get the path for first image file (marked for comparison in the input cvs)
-                            print(img1)
+                            
                             img2 = line[1] #get path for the second image file ( marked for comparison in the input cvs)
-                            print(img2)
+                            
                         
                         #check if the paths defined for image1 and image2 exist on the filesystem
                             if path.isfile(img1) and path.isfile(img2):
