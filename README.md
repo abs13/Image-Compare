@@ -105,7 +105,7 @@ Process image comparison :
 ## Developer Documentation
 Developer documentation is availale at
 
-[documentation](./html/image_compare.html)
+[documentation]( https://htmlpreview.github.io/?/html/image_compare.html)
 
 ## Contributing
 
