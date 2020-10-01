@@ -1,4 +1,4 @@
-# Image-Comapre
+# Image-Compare
 
 Image comapre is a python script that reads an input csv file and can compares two images provided on each row. 
 The utility uses [imagehash](https://pypi.org/project/ImageHash/) module for core image comparison.
