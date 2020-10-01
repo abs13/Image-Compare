@@ -9,3 +9,5 @@
 /output_2020_09_28_19_44_48.csv
 /program.py
 /SynologyDrive
+/dist/*.spec
+/temp_for_loacl

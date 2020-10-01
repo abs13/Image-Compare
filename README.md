@@ -31,7 +31,7 @@ To use the utility as a python script, follow the instructions below.
 3. Pillow
 ##### Check python version:
 ``` python
-        python --version
+        python3 --version
 ```
 #### Install python module dependencies using pip:
 Module dependencies are  bundled together in [requirments.txt](requirments.txt) and can be installed using 
@@ -112,8 +112,6 @@ Process image comparison :
  python image_compare.py -i <input csv file> -o <output csv file> *(Optional)
 ```
 
-
-> In absence of -o argument, default location *pwd* is used with default filename as output.csv 
 
 ## Developer Documentation
 Developer documentation is availale at
