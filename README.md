@@ -7,10 +7,10 @@ The algorithm used was *dhash*
 
 #### Input file format
 
-![sample input](./resources/Sample_input.png)
+![sample input](./resources/Sample_input.PNG)
 
 #### output file sample
-![Sample_output](./resources/Sample_output.png)
+![Sample_output](./resources/Sample_output.PNG)
 ## Platform Support
 The utility can run on both Windows 10 and linux. 
 For linux the utility has been tested on Centos 7, Centos 8 ,Ubuntu 20.04.1 LTS and Vagrant.
@@ -19,7 +19,7 @@ The utility can be used as a pre-built executable or as a python script.
 ### Use pre-build exe files
 Pre-built executable are available for Windows 10 and linux
 These can be found under individual directories under dist folder. 
-    ![distribution_dir_tree](resources/dist_dir_tree.png)
+    ![distribution_dir_tree](resources/dist_dir_tree.PNG)
 
 
 ### Using image_compare.py script
