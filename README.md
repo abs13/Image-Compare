@@ -2,7 +2,7 @@
 
 Image comapre is a python script that reads an input csv file and can compares two images provided on each row. 
 The utility uses [imagehash](https://pypi.org/project/ImageHash/) module for core image comparison.
-The algorithm used was *dhash*
+The algorithm used was *phash*
 > The utility is re-runnable creating a backup of previous output files in <filename>_YYYY_MM_DD_H_M_S.csv format
 
 #### Input file format
@@ -12,15 +12,20 @@ The algorithm used was *dhash*
 #### output file sample
 ![Sample_output](./resources/Sample_output.PNG)
 ## Platform Support
-The utility can run on both Windows 10 and linux. 
-For linux the utility has been tested on Centos 7, Centos 8 ,Ubuntu 20.04.1 LTS and Vagrant.
-## Installation
-The utility can be used as a pre-built executable or as a python script.
+The utility can run on both Windows 10 and linux.  
 ### Use pre-build exe files
-Pre-built executable are available for Windows 10 and linux
+Pre-built executable are available for Windows 10, linux and MacOS Mojave.
 These can be found under individual directories under dist folder. 
     ![distribution_dir_tree](resources/dist_dir_tree.PNG)
 
+##### Linux support: 
+The utility has been tested on Centos 7, Centos 8 ,Ubuntu 20.04.1 LTS and Vagrant.
+##### Windows Support: 
+The utility has been tested on windows 10.
+##### MacOS:
+Mac OS support has been tested on Mojave but code signing issues can break it on other versions.
+## Installation
+To use the utility as a python script, follow the instructions below.
 
 ### Using image_compare.py script
 
@@ -29,7 +34,7 @@ These can be found under individual directories under dist folder.
 2. imagehash
 3. Pillow
 #### Installing python module dependencies:
-Module dependencies are  bundled together in requirments.txt
+Module dependencies are  bundled together in requirments.txt and can be installed using 
 > pip install -r requirments.txt
 
 ## Usage
