@@ -33,7 +33,7 @@ import functools
 import csv
 import traceback
 from pprint import pprint
-
+import errno
 
 def getOSType():
     &#39;&#39;&#39;
@@ -52,6 +52,57 @@ def getOSType():
     elif my_platform == &#39;DARWIN&#39;:
         print(&#34;Running on Mac OS&#34;)
     return(my_platform)
+
+def backuponRerun(outcsvfile,verbosity):
+    &#39;&#39;&#39;
+        Function to create backup of previosuly generated files before creating new file.
+
+        Checks for write permissions for new file.
+
+        If no filename is passed. Create a default name
+        
+            parameters:
+                a (str): Path to output csv file.
+                b (str): Verbosity TRUE or FALSE
+            returns:
+                : Nothing
+    &#39;&#39;&#39;
+    import datetime #import datetime. This will be used to create a backup of the output file in case older output dile exists.
+    import pathlib  #Import pathlib to handle paths and create backups of folders
+    suffx_var = datetime.datetime.now().strftime(&#34;%Y_%m_%d_%H_%M_%S&#34;) # Calculate the suffix to append to old output file. Format is YYYY_MM_DD_H_M_S
+    #open output file and insert the header into it
+    if path.exists(outcsvfile):
+        print(&#39;deault output file specified or re-run detected. Creating a backup&#39;)
+        vfilebase = pathlib.Path(outcsvfile).stem # capture the filename without extension. 
+        print(&#39;re-naming &#39; + outcsvfile)
+        try:
+            os.rename(outcsvfile,vfilebase + &#34;_&#34;+suffx_var + &#39;.csv&#39;) #regenerate the filename as &lt;file_name&gt;_&lt;Date Suffic&gt;.csv
+            #check if can rename a file in the specified directory
+        except PermissionError as permissionerr: # If permission denied, capture that and displat to user. Exit futher execution
+            
+            if verbosity is True:
+                print(permissionerr)
+                
+                print (&#34;******************Premission Denied to rename old file&#34;)
+                print()
+                print (&#34;******************Check permissions and retry&#34;)
+                exc_type, exc_value, exc_tb = sys.exc_info()
+                pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
+                exit(2)
+            else:
+                print(permissionerr)
+                print(&#39;run utility with --verbose for detailed error&#39; )
+        except IOError as ioerr: #If any other IO error  (e.g. DISK Full), Capture that , stop further execution and display the exception to user.
+            if verbosity is True:
+                print()
+                exc_type, exc_value, exc_tb = sys.exc_info()
+                pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
+        
+            else:
+                print(ioerr)
+                print(&#39;run utility with --verbose for detailed error&#39; )
+        
+
 def getimagehash(image1path,image2path):
     &#39;&#39;&#39;
         Function to compare images. 
@@ -72,58 +123,8 @@ def getimagehash(image1path,image2path):
     myimghash2 = imagehash.dhash(Image.open(image2path))
     myhashdiff = myimghash1 - myimghash2
     return (myhashdiff) #return the difference between the dhashes of two input images
-
-
-def initializeOutfile(outcsvfile):
-    &#39;&#39;&#39;
-        Function to generate a blank output csv file with headers Image1, Image 2, Similar, Elapse.
-
-        It takes care of taking backup of previosuly generated files before creating new file.
-
-        Checks for write permissions for new file.
-
-        If no filename is passed. Create a default file name
-        
-            parameters:
-                a (str): Path to output csv file.
-            returns:
-                : Nothing
-    &#39;&#39;&#39;
-    import datetime #import datetime. This will be used to create a backup of the output file in case older output dile exists.
-    import pathlib  #Import pathlib to handle paths and create backups of folders
-    suffx_var = datetime.datetime.now().strftime(&#34;%Y_%m_%d_%H_%M_%S&#34;) # Calculate the suffix to append to old output file. Format is YYYY_MM_DD_H_M_S
-    #open output file and insert the header into it
-    if path.exists(outcsvfile):
-        vfilebase = pathlib.Path(outcsvfile).stem # capture the filename without extension. 
-        os.rename(outcsvfile,vfilebase + &#34;_&#34;+suffx_var + &#39;.csv&#39;) #regenerate the filename as &lt;file_name&gt;_&lt;Date Suffic&gt;.csv
-    try:
-        outputfile = open(outcsvfile , &#39;w&#39;) #check if can create a file in the specified directory
-      
-    except PermissionError as permissionerr: # If permission denied, capture that and displat to user. Exit futher execution
-        print(permissionerr)
-        print()
-        print (&#34;******************Premission Denied to create file in the specified output location******************&#34;)
-        print (&#34;******************Check permissions and retry******************&#34;)
-        print()
-        exc_type, exc_value, exc_tb = sys.exc_info()
-        pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
-        exit(2)
-    except IOError as ioerr: #If any other IO error  (e.g. DISK Full), Capture that , stop further execution and display the exception to user.
-        print(ioerr)
-        print()
-        
-        exc_type, exc_value, exc_tb = sys.exc_info()
-        pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
-        exit(2)
-        
-
-    else: #If no exceptions raised, open the optput file and insert the  header for the CSV file. Close the file handle on completion
-        writehandle = csv.writer(outputfile)
-        writehandle.writerow([&#39;Image1&#39;,&#39;Image2&#39;, &#39;Similar&#39;,&#39;Elapsed&#39;])
-        outputfile.close()  
-
-
-
+def cleanupEmpty():
+    print(&#39;dummy&#39;)
 
 def main(): #Function to generate the menu for the utility
     &#39;&#39;&#39;
@@ -143,20 +144,22 @@ def main(): #Function to generate the menu for the utility
                     : Nothing
     &#39;&#39;&#39;
     import argparse
+    #sys.tracebacklimit = 0
     parser = argparse.ArgumentParser(prog=&#39;image_compare&#39;,description=&#34;Use this to compare images&#34;) #initate the parser
     parser.version = &#34;1.0&#34; # Set version as 1.0. this can be displayed using the -v optional paramater
     parser.add_argument(&#39;-i&#39;,action=&#34;store&#34;,dest=&#39;input_file&#39;,help=&#34;Input csv containig paths of images to compare&#34;, required=True) #define a required param, to capture the input csv file
     parser.add_argument(&#39;-o&#39;,action=&#34;store&#34;, dest=&#34;output_file&#34;,type=str,default=&#39;output.csv&#39;) #define an option parameter for output file
+    parser.add_argument(&#39;--verbose&#39;,action=&#34;store_true&#34;) #define a version param
+
     parser.add_argument(&#39;-v&#39;,action=&#34;version&#34;,) #define a version param
     my_arguments=parser.parse_args()
     csvtoread = my_arguments.input_file
     outcsvfile = my_arguments.output_file
-     
+    verbosity = my_arguments.verbose 
    
-    initializeOutfile(outcsvfile) #call the fuction to initialize the output file. the called function only adds a header here
-    processCompare(csvtoread,outcsvfile) #Call the function to compare the file sets based on the paths provided in input csv file
-    
-def processCompare(csvtoread,outcsvfile):
+    backuponRerun(outcsvfile,verbosity) #call the fuction to initialize the output file. the called function only adds a header here
+    processCompare(csvtoread,outcsvfile,verbosity) #Call the function to compare the file sets based on the paths provided in input csv file
+def processCompare(csvtoread,outcsvfile,verbosity):
     &#39;&#39;&#39; 
         Takes two inputs, the input and output csv files. Loops over all lines in input csv and processes hash diffs.
 
@@ -170,83 +173,99 @@ def processCompare(csvtoread,outcsvfile):
     &#39;&#39;&#39;
     import timeit
     my_platform = getOSType() # get the OS type
-    if path.isfile(csvtoread): #check if the input file provided by users exists and is a file
-        try:
-            my_input_cvs=open(csvtoread, &#39;r&#39;)
-            
-        except PermissionError as permissionerr: #capture any permission errors in case user does not have permissions to read the file
+    try:
+        outputfile = open(outcsvfile , &#39;a&#39;) # check if output file can be opened for inserting new records ( in append mode )
+        headernames = [&#39;Image1&#39;,&#39;Image2&#39;,&#39;Similar&#39;,&#39;Elapsed&#39;]
+        writehandle = csv.DictWriter(outputfile,fieldnames=headernames)
+        writehandle.writeheader()
+    
+    except PermissionError as permissionerr:
+        
+        if verbosity is True :
             print(permissionerr)
-            print (&#34;******************Check permissions and retry******************&#34;)
+            exc_type, exc_value, exc_tb = sys.exc_info()
+            pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
+        else:
+            print (&#39;******************Check permissions and retry******************&#39;)
+            print()
+            print(permissionerr)
+    except IOError as ioerr: #capture any IO excpetions e.g. DISK FULL
+        if verbosity is True :
+            print(ioerr) 
             print()
             exc_type, exc_value, exc_tb = sys.exc_info()
             pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
-            
         else:
-            with my_input_cvs: #If no errors raised, continue processing the file
-                csvcontent = csv.reader(my_input_cvs) # read each line from file
-                next(csvcontent, None)  # skip the headers in the unput csv file
-                itr_var = 1 #initialize a counter. this will be used to display the row number in case processing failes for any of the rows i csv file
-                for line in csvcontent: 
-                    if not line : #if the line is empty, do nothing and moved to next
-                       continue
-                    else: #else continue processing
-                        itr_var = itr_var + 1  
-                        img1 = line[0] #get the path for first image file (marked for comparison in the input cvs)
-                        img2 = line[1] #get path for the second image file ( marked for comparison in the input cvs)
+            print(&#39;I/O Erro&#39;)
+            print(&#39;run utility with --verbose&#39;)
+        exit(2)
+    else:
+        
+        
+        if path.isfile(csvtoread) and path.getsize(csvtoread) &gt; 0 : #check if the input file provided by users exists and is a file
+            try:
+                my_input_cvs=open(csvtoread, &#39;r&#39;)
+            
+            except PermissionError as permissionerr: #capture any permission errors in case user does not have permissions to read the file
+                if verbosity is True :
+                    print(permissionerr)
+                    exc_type, exc_value, exc_tb = sys.exc_info()
+                    pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
+                else:
+                    print(permissionerr)
+                    print (&#34;******************Check permissions and retry******************&#34;)
+                    print()
+                
+            
+            else:
+             
+                with my_input_cvs: #If no errors raised, continue processing the file
+                    csvcontent = csv.reader(my_input_cvs) # read each line from file
+                    next(csvcontent, None)  # skip the headers in the input csv file
+                    itr_var = 1 #initialize a counter. this will be used to display the row number in case processing failes for any of the rows i csv file
+                    for line in csvcontent: 
+                        if not line : #if the line is empty, do nothing and moved to next
+                            continue
+                        else: #else continue processing
+                            itr_var = itr_var + 1  
+                            img1 = line[0] #get the path for first image file (marked for comparison in the input cvs)
+                            print(img1)
+                            img2 = line[1] #get path for the second image file ( marked for comparison in the input cvs)
+                            print(img2)
                         
                         #check if the paths defined for image1 and image2 exist on the filesystem
-                        if path.isfile(img1) and path.isfile(img2):
-                            #call the imagehash calculater function to calculate the hashdiff of image1 and image2
-                            myhashdiff = getimagehash(img1, img2)
-                            #calculate time taken to calculate each hash by above function
-                            execCost = timeit.timeit(stmt=functools.partial(getimagehash, img1, img2), number=10)
-                            try:
-                                outputfile = open(outcsvfile , &#39;a&#39;) # check if output file can be opened for insearting new records ( in append mode )
-                            except IOError as ioerr: #capture any IO excpetions e.g. DISK FULL
-                                print(ioerr) 
-                                print()
-                                exc_type, exc_value, exc_tb = sys.exc_info()
-                                pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
-                                exit(2)
-    
-                            else:    #else continue as intended
-                                writehandle = csv.writer(outputfile)
-                                writehandle.writerow([img1,img2,myhashdiff,execCost])
-                                outputfile.close()
-                        elif path.isfile(img1) == False and path.isfile(img2): # check for both images if the path defined exists.
-                            print (img1 + &#34; not a valid path on row &#34; + str(itr_var) ) 
-                            print (&#34;Skipping row &#34; + str(itr_var))
-                        elif path.isfile(img1) and path.isfile(img2) == False:
-                            print (img2 + &#34; not a valid path on row &#34; + str(itr_var))
-                            print (&#34;Skipping row &#34; + str(itr_var))
+                            if path.isfile(img1) and path.isfile(img2):
+                                #call the imagehash calculater function to calculate the hashdiff of image1 and image2
+                                myhashdiff = getimagehash(img1, img2)
+                                #calculate time taken to calculate each hash by above function
+                                execCost = timeit.timeit(stmt=functools.partial(getimagehash, img1, img2), number=100)
+                                writehandle.writerow({&#39;Image1&#39;: img1,&#39;Image2&#39;: img2,&#39;Similar&#39;: myhashdiff,&#39;Elapsed&#39;: execCost})
+                               
+                            elif path.isfile(img1) == False and path.isfile(img2): # check for both images if the path defined exists.
+                                print (img1 + &#34; not a valid path on row &#34; + str(itr_var) ) 
+                                print (&#34;Skipping row &#34; + str(itr_var))
 
-                        elif path.isfile(img1) ==False and path.isfile(img2) == False:
-                            print (img2 + &#34; and &#34; + img2 + &#34; not a valid path on row &#34; + str(itr_var))
-                            print (&#34;Skipping row &#34; + str(itr_var))
-    else:
-        print(&#34;Input CVS file &#34; + csvtoread + &#39;does not exist.&#39; ) # If input csv path does not exist, inform the user.
-        print(&#34;Please check path specified and try again&#34;)
-                    
+                            elif path.isfile(img1) and path.isfile(img2) == False:
+                                print (img2 + &#34; not a valid path on row &#34; + str(itr_var))
+                                print (&#34;Skipping row &#34; + str(itr_var))
 
-
-
+                            elif path.isfile(img1) ==False and path.isfile(img2) == False:
+                                print (img1 + &#34; and &#34; + img2 + &#34; not a valid path on row &#34; + str(itr_var))
+                                print (&#34;Skipping row &#34; + str(itr_var))
+            finally:
+                outputfile.close()
+                cleanupEmpty()
+        elif path.isfile(csvtoread) and path.getsize(csvtoread) == 0:
+            raise Exception(&#39;Input csv empty. Exiting....&#39;)
+            exit()
+        
+        elif path.isfile(csvtoread) is False:
+            raise FileNotFoundError (errno.ENOENT, os.strerror(errno.ENOENT), csvtoread)
+            print(&#34;Input CVS file &#34; + csvtoread + &#39; does not exist.&#39; ) # If input csv path does not exist, inform the user.
+            print(&#34;Please check path specified and try again&#34;)
+            exit(2)
 if __name__ == &#39;__main__&#39;:
-    &#39;&#39;&#39;
-    This program compares images provided in an input csv file 
-    It creates a diff between dhash of two images and inserts that in an output csv file
-    The program takes an input csv file as a reuiqred param
-
-    The input csv file  needs to be defined as -i &lt; file path to the input csv file&gt; on command line
-
-    The -h switch will display usage of the script and is optional
-
-    The -v switch will display the version of the utility and is optional
-
-    The -o switch can be used to define the output file where the processed results are published.
-    If no output file is defined on the command line, the default value of output.csv.
-
-    The default output.csv dir is the base folder where the script was run (cwd )
-    &#39;&#39;&#39;
+    
     main() #Call the main function
                  </code></pre>
 </details>
@@ -258,6 +277,86 @@ if __name__ == &#39;__main__&#39;:
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="image_compare.backuponRerun"><code class="name flex">
+<span>def <span class="ident">backuponRerun</span></span>(<span>outcsvfile, verbosity)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Function to create backup of previosuly generated files before creating new file.</p>
+<p>Checks for write permissions for new file.</p>
+<p>If no filename is passed. Create a default name</p>
+<pre><code>parameters:
+    a (str): Path to output csv file.
+    b (str): Verbosity TRUE or FALSE
+returns:
+    : Nothing
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def backuponRerun(outcsvfile,verbosity):
+    &#39;&#39;&#39;
+        Function to create backup of previosuly generated files before creating new file.
+
+        Checks for write permissions for new file.
+
+        If no filename is passed. Create a default name
+        
+            parameters:
+                a (str): Path to output csv file.
+                b (str): Verbosity TRUE or FALSE
+            returns:
+                : Nothing
+    &#39;&#39;&#39;
+    import datetime #import datetime. This will be used to create a backup of the output file in case older output dile exists.
+    import pathlib  #Import pathlib to handle paths and create backups of folders
+    suffx_var = datetime.datetime.now().strftime(&#34;%Y_%m_%d_%H_%M_%S&#34;) # Calculate the suffix to append to old output file. Format is YYYY_MM_DD_H_M_S
+    #open output file and insert the header into it
+    if path.exists(outcsvfile):
+        print(&#39;deault output file specified or re-run detected. Creating a backup&#39;)
+        vfilebase = pathlib.Path(outcsvfile).stem # capture the filename without extension. 
+        print(&#39;re-naming &#39; + outcsvfile)
+        try:
+            os.rename(outcsvfile,vfilebase + &#34;_&#34;+suffx_var + &#39;.csv&#39;) #regenerate the filename as &lt;file_name&gt;_&lt;Date Suffic&gt;.csv
+            #check if can rename a file in the specified directory
+        except PermissionError as permissionerr: # If permission denied, capture that and displat to user. Exit futher execution
+            
+            if verbosity is True:
+                print(permissionerr)
+                
+                print (&#34;******************Premission Denied to rename old file&#34;)
+                print()
+                print (&#34;******************Check permissions and retry&#34;)
+                exc_type, exc_value, exc_tb = sys.exc_info()
+                pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
+                exit(2)
+            else:
+                print(permissionerr)
+                print(&#39;run utility with --verbose for detailed error&#39; )
+        except IOError as ioerr: #If any other IO error  (e.g. DISK Full), Capture that , stop further execution and display the exception to user.
+            if verbosity is True:
+                print()
+                exc_type, exc_value, exc_tb = sys.exc_info()
+                pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
+        
+            else:
+                print(ioerr)
+                print(&#39;run utility with --verbose for detailed error&#39; )</code></pre>
+</details>
+</dd>
+<dt id="image_compare.cleanupEmpty"><code class="name flex">
+<span>def <span class="ident">cleanupEmpty</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cleanupEmpty():
+    print(&#39;dummy&#39;)</code></pre>
+</details>
+</dd>
 <dt id="image_compare.getOSType"><code class="name flex">
 <span>def <span class="ident">getOSType</span></span>(<span>)</span>
 </code></dt>
@@ -329,72 +428,6 @@ returns:
     return (myhashdiff) #return the difference between the dhashes of two input images</code></pre>
 </details>
 </dd>
-<dt id="image_compare.initializeOutfile"><code class="name flex">
-<span>def <span class="ident">initializeOutfile</span></span>(<span>outcsvfile)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Function to generate a blank output csv file with headers Image1, Image 2, Similar, Elapse.</p>
-<p>It takes care of taking backup of previosuly generated files before creating new file.</p>
-<p>Checks for write permissions for new file.</p>
-<p>If no filename is passed. Create a default file name</p>
-<pre><code>parameters:
-    a (str): Path to output csv file.
-returns:
-    : Nothing
-</code></pre></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def initializeOutfile(outcsvfile):
-    &#39;&#39;&#39;
-        Function to generate a blank output csv file with headers Image1, Image 2, Similar, Elapse.
-
-        It takes care of taking backup of previosuly generated files before creating new file.
-
-        Checks for write permissions for new file.
-
-        If no filename is passed. Create a default file name
-        
-            parameters:
-                a (str): Path to output csv file.
-            returns:
-                : Nothing
-    &#39;&#39;&#39;
-    import datetime #import datetime. This will be used to create a backup of the output file in case older output dile exists.
-    import pathlib  #Import pathlib to handle paths and create backups of folders
-    suffx_var = datetime.datetime.now().strftime(&#34;%Y_%m_%d_%H_%M_%S&#34;) # Calculate the suffix to append to old output file. Format is YYYY_MM_DD_H_M_S
-    #open output file and insert the header into it
-    if path.exists(outcsvfile):
-        vfilebase = pathlib.Path(outcsvfile).stem # capture the filename without extension. 
-        os.rename(outcsvfile,vfilebase + &#34;_&#34;+suffx_var + &#39;.csv&#39;) #regenerate the filename as &lt;file_name&gt;_&lt;Date Suffic&gt;.csv
-    try:
-        outputfile = open(outcsvfile , &#39;w&#39;) #check if can create a file in the specified directory
-      
-    except PermissionError as permissionerr: # If permission denied, capture that and displat to user. Exit futher execution
-        print(permissionerr)
-        print()
-        print (&#34;******************Premission Denied to create file in the specified output location******************&#34;)
-        print (&#34;******************Check permissions and retry******************&#34;)
-        print()
-        exc_type, exc_value, exc_tb = sys.exc_info()
-        pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
-        exit(2)
-    except IOError as ioerr: #If any other IO error  (e.g. DISK Full), Capture that , stop further execution and display the exception to user.
-        print(ioerr)
-        print()
-        
-        exc_type, exc_value, exc_tb = sys.exc_info()
-        pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
-        exit(2)
-        
-
-    else: #If no exceptions raised, open the optput file and insert the  header for the CSV file. Close the file handle on completion
-        writehandle = csv.writer(outputfile)
-        writehandle.writerow([&#39;Image1&#39;,&#39;Image2&#39;, &#39;Similar&#39;,&#39;Elapsed&#39;])
-        outputfile.close()  </code></pre>
-</details>
-</dd>
 <dt id="image_compare.main"><code class="name flex">
 <span>def <span class="ident">main</span></span>(<span>)</span>
 </code></dt>
@@ -435,22 +468,25 @@ returns:
                     : Nothing
     &#39;&#39;&#39;
     import argparse
+    #sys.tracebacklimit = 0
     parser = argparse.ArgumentParser(prog=&#39;image_compare&#39;,description=&#34;Use this to compare images&#34;) #initate the parser
     parser.version = &#34;1.0&#34; # Set version as 1.0. this can be displayed using the -v optional paramater
     parser.add_argument(&#39;-i&#39;,action=&#34;store&#34;,dest=&#39;input_file&#39;,help=&#34;Input csv containig paths of images to compare&#34;, required=True) #define a required param, to capture the input csv file
     parser.add_argument(&#39;-o&#39;,action=&#34;store&#34;, dest=&#34;output_file&#34;,type=str,default=&#39;output.csv&#39;) #define an option parameter for output file
+    parser.add_argument(&#39;--verbose&#39;,action=&#34;store_true&#34;) #define a version param
+
     parser.add_argument(&#39;-v&#39;,action=&#34;version&#34;,) #define a version param
     my_arguments=parser.parse_args()
     csvtoread = my_arguments.input_file
     outcsvfile = my_arguments.output_file
-     
+    verbosity = my_arguments.verbose 
    
-    initializeOutfile(outcsvfile) #call the fuction to initialize the output file. the called function only adds a header here
-    processCompare(csvtoread,outcsvfile) #Call the function to compare the file sets based on the paths provided in input csv file</code></pre>
+    backuponRerun(outcsvfile,verbosity) #call the fuction to initialize the output file. the called function only adds a header here
+    processCompare(csvtoread,outcsvfile,verbosity) #Call the function to compare the file sets based on the paths provided in input csv file</code></pre>
 </details>
 </dd>
 <dt id="image_compare.processCompare"><code class="name flex">
-<span>def <span class="ident">processCompare</span></span>(<span>csvtoread, outcsvfile)</span>
+<span>def <span class="ident">processCompare</span></span>(<span>csvtoread, outcsvfile, verbosity)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Takes two inputs, the input and output csv files. Loops over all lines in input csv and processes hash diffs.</p>
@@ -465,7 +501,7 @@ returns:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def processCompare(csvtoread,outcsvfile):
+<pre><code class="python">def processCompare(csvtoread,outcsvfile,verbosity):
     &#39;&#39;&#39; 
         Takes two inputs, the input and output csv files. Loops over all lines in input csv and processes hash diffs.
 
@@ -479,62 +515,97 @@ returns:
     &#39;&#39;&#39;
     import timeit
     my_platform = getOSType() # get the OS type
-    if path.isfile(csvtoread): #check if the input file provided by users exists and is a file
-        try:
-            my_input_cvs=open(csvtoread, &#39;r&#39;)
-            
-        except PermissionError as permissionerr: #capture any permission errors in case user does not have permissions to read the file
+    try:
+        outputfile = open(outcsvfile , &#39;a&#39;) # check if output file can be opened for inserting new records ( in append mode )
+        headernames = [&#39;Image1&#39;,&#39;Image2&#39;,&#39;Similar&#39;,&#39;Elapsed&#39;]
+        writehandle = csv.DictWriter(outputfile,fieldnames=headernames)
+        writehandle.writeheader()
+    
+    except PermissionError as permissionerr:
+        
+        if verbosity is True :
             print(permissionerr)
-            print (&#34;******************Check permissions and retry******************&#34;)
+            exc_type, exc_value, exc_tb = sys.exc_info()
+            pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
+        else:
+            print (&#39;******************Check permissions and retry******************&#39;)
+            print()
+            print(permissionerr)
+    except IOError as ioerr: #capture any IO excpetions e.g. DISK FULL
+        if verbosity is True :
+            print(ioerr) 
             print()
             exc_type, exc_value, exc_tb = sys.exc_info()
             pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
-            
         else:
-            with my_input_cvs: #If no errors raised, continue processing the file
-                csvcontent = csv.reader(my_input_cvs) # read each line from file
-                next(csvcontent, None)  # skip the headers in the unput csv file
-                itr_var = 1 #initialize a counter. this will be used to display the row number in case processing failes for any of the rows i csv file
-                for line in csvcontent: 
-                    if not line : #if the line is empty, do nothing and moved to next
-                       continue
-                    else: #else continue processing
-                        itr_var = itr_var + 1  
-                        img1 = line[0] #get the path for first image file (marked for comparison in the input cvs)
-                        img2 = line[1] #get path for the second image file ( marked for comparison in the input cvs)
+            print(&#39;I/O Erro&#39;)
+            print(&#39;run utility with --verbose&#39;)
+        exit(2)
+    else:
+        
+        
+        if path.isfile(csvtoread) and path.getsize(csvtoread) &gt; 0 : #check if the input file provided by users exists and is a file
+            try:
+                my_input_cvs=open(csvtoread, &#39;r&#39;)
+            
+            except PermissionError as permissionerr: #capture any permission errors in case user does not have permissions to read the file
+                if verbosity is True :
+                    print(permissionerr)
+                    exc_type, exc_value, exc_tb = sys.exc_info()
+                    pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
+                else:
+                    print(permissionerr)
+                    print (&#34;******************Check permissions and retry******************&#34;)
+                    print()
+                
+            
+            else:
+             
+                with my_input_cvs: #If no errors raised, continue processing the file
+                    csvcontent = csv.reader(my_input_cvs) # read each line from file
+                    next(csvcontent, None)  # skip the headers in the input csv file
+                    itr_var = 1 #initialize a counter. this will be used to display the row number in case processing failes for any of the rows i csv file
+                    for line in csvcontent: 
+                        if not line : #if the line is empty, do nothing and moved to next
+                            continue
+                        else: #else continue processing
+                            itr_var = itr_var + 1  
+                            img1 = line[0] #get the path for first image file (marked for comparison in the input cvs)
+                            print(img1)
+                            img2 = line[1] #get path for the second image file ( marked for comparison in the input cvs)
+                            print(img2)
                         
                         #check if the paths defined for image1 and image2 exist on the filesystem
-                        if path.isfile(img1) and path.isfile(img2):
-                            #call the imagehash calculater function to calculate the hashdiff of image1 and image2
-                            myhashdiff = getimagehash(img1, img2)
-                            #calculate time taken to calculate each hash by above function
-                            execCost = timeit.timeit(stmt=functools.partial(getimagehash, img1, img2), number=10)
-                            try:
-                                outputfile = open(outcsvfile , &#39;a&#39;) # check if output file can be opened for insearting new records ( in append mode )
-                            except IOError as ioerr: #capture any IO excpetions e.g. DISK FULL
-                                print(ioerr) 
-                                print()
-                                exc_type, exc_value, exc_tb = sys.exc_info()
-                                pprint(traceback.format_exception(exc_type,exc_value,exc_tb))
-                                exit(2)
-    
-                            else:    #else continue as intended
-                                writehandle = csv.writer(outputfile)
-                                writehandle.writerow([img1,img2,myhashdiff,execCost])
-                                outputfile.close()
-                        elif path.isfile(img1) == False and path.isfile(img2): # check for both images if the path defined exists.
-                            print (img1 + &#34; not a valid path on row &#34; + str(itr_var) ) 
-                            print (&#34;Skipping row &#34; + str(itr_var))
-                        elif path.isfile(img1) and path.isfile(img2) == False:
-                            print (img2 + &#34; not a valid path on row &#34; + str(itr_var))
-                            print (&#34;Skipping row &#34; + str(itr_var))
+                            if path.isfile(img1) and path.isfile(img2):
+                                #call the imagehash calculater function to calculate the hashdiff of image1 and image2
+                                myhashdiff = getimagehash(img1, img2)
+                                #calculate time taken to calculate each hash by above function
+                                execCost = timeit.timeit(stmt=functools.partial(getimagehash, img1, img2), number=100)
+                                writehandle.writerow({&#39;Image1&#39;: img1,&#39;Image2&#39;: img2,&#39;Similar&#39;: myhashdiff,&#39;Elapsed&#39;: execCost})
+                               
+                            elif path.isfile(img1) == False and path.isfile(img2): # check for both images if the path defined exists.
+                                print (img1 + &#34; not a valid path on row &#34; + str(itr_var) ) 
+                                print (&#34;Skipping row &#34; + str(itr_var))
 
-                        elif path.isfile(img1) ==False and path.isfile(img2) == False:
-                            print (img2 + &#34; and &#34; + img2 + &#34; not a valid path on row &#34; + str(itr_var))
-                            print (&#34;Skipping row &#34; + str(itr_var))
-    else:
-        print(&#34;Input CVS file &#34; + csvtoread + &#39;does not exist.&#39; ) # If input csv path does not exist, inform the user.
-        print(&#34;Please check path specified and try again&#34;)</code></pre>
+                            elif path.isfile(img1) and path.isfile(img2) == False:
+                                print (img2 + &#34; not a valid path on row &#34; + str(itr_var))
+                                print (&#34;Skipping row &#34; + str(itr_var))
+
+                            elif path.isfile(img1) ==False and path.isfile(img2) == False:
+                                print (img1 + &#34; and &#34; + img2 + &#34; not a valid path on row &#34; + str(itr_var))
+                                print (&#34;Skipping row &#34; + str(itr_var))
+            finally:
+                outputfile.close()
+                cleanupEmpty()
+        elif path.isfile(csvtoread) and path.getsize(csvtoread) == 0:
+            raise Exception(&#39;Input csv empty. Exiting....&#39;)
+            exit()
+        
+        elif path.isfile(csvtoread) is False:
+            raise FileNotFoundError (errno.ENOENT, os.strerror(errno.ENOENT), csvtoread)
+            print(&#34;Input CVS file &#34; + csvtoread + &#39; does not exist.&#39; ) # If input csv path does not exist, inform the user.
+            print(&#34;Please check path specified and try again&#34;)
+            exit(2)</code></pre>
 </details>
 </dd>
 </dl>
@@ -549,10 +620,11 @@ returns:
 </div>
 <ul id="index">
 <li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="">
+<ul class="two-column">
+<li><code><a title="image_compare.backuponRerun" href="#image_compare.backuponRerun">backuponRerun</a></code></li>
+<li><code><a title="image_compare.cleanupEmpty" href="#image_compare.cleanupEmpty">cleanupEmpty</a></code></li>
 <li><code><a title="image_compare.getOSType" href="#image_compare.getOSType">getOSType</a></code></li>
 <li><code><a title="image_compare.getimagehash" href="#image_compare.getimagehash">getimagehash</a></code></li>
-<li><code><a title="image_compare.initializeOutfile" href="#image_compare.initializeOutfile">initializeOutfile</a></code></li>
 <li><code><a title="image_compare.main" href="#image_compare.main">main</a></code></li>
 <li><code><a title="image_compare.processCompare" href="#image_compare.processCompare">processCompare</a></code></li>
 </ul>

@@ -1,9 +1,16 @@
 # Image-Comapre
 
-Image comapre is a python script that reads a input csv file and can compares two images provided on each row. 
+Image comapre is a python script that reads an input csv file and can compares two images provided on each row. 
 The utility uses [imagehash](https://pypi.org/project/ImageHash/) module for core image comparison.
 The algorithm used was *dhash*
+> The utility is re-runnable creating a backup of previous output files in <filename>_YYYY_MM_DD_H_M_S.csv format
 
+#### Input file format
+
+![sample input](./resources/Sample_input.png)
+
+#### output file sample
+![Sample_output](./resources/Sample_output.png)
 ## Platform Support
 The utility can run on both Windows 10 and linux. 
 For linux the utility has been tested on Centos 7, Centos 8 ,Ubuntu 20.04.1 LTS and Vagrant.
