@@ -6,12 +6,14 @@ The algorithm used was *phash*
 > The utility is re-runnable creating a backup of previous output files in <filename>_YYYY_MM_DD_H_M_S.csv format
 
 ## Platform Support
-The utility can run on both Windows 10 and linux and Mac OSX ( Mojave and Catalina)  
-## Distribution
+- The pre-built executable can be run on Windows 10, linux and Mac OSX ( Mojave and Catalina). 
+
+- For other platforms, use the python script *image_compare.py*
+## Distributions:
 
 ### Pre-build exe files
-Pre-built executable are available for Windows 10, linux and macOS .
-These can be found under individual directories under dist folder. 
+- Available for Windows 10, linux and macOS .
+- These can be found under individual directories under dist folder. 
     ![distribution_dir_tree](resources/dist_dir_tree.PNG)
 
 ##### Linux : 
@@ -23,33 +25,41 @@ The utility has been tested on windows 10.
 ##### macOS :
 macOS support has been tested on Mojave and Catalina . The distribution has been code-signed using self generated certificates.
 [macOS](dirs/../dist/mac/image_compare)
-### Run as Python script
-To use the utility as a python script, follow the instructions below.
-### Pre-requisites:
+
+###  Python script setup
+The code base folder contains the *image_compare.py* python script 
+
+> To run as a python script, follow the instructions below.
+
+##### Pre-requisites:
 1. Python 3.5 or greater
 2. imagehash
 3. Pillow
-##### Check python version:
+###### Check python version:
 ``` python
         python3 --version
 ```
-#### Install python module dependencies using pip:
+###### Install python module dependencies using pip:
 Module dependencies are  bundled together in [requirments.txt](requirments.txt) and can be installed using 
 ```python
        python3 -m pip install -r requirments.txt
 ```
-#### Input parametes and Output file
-Requires input csv file
-##### Input csv file format
+
+### Input parameters and Output file
+#### Input csv file: 
+    Required 
+###### Input csv file format
 
 ![sample input](./resources/Sample_input.PNG)
 
-> output csv file name is *optional*. In absence of an output filename on CLI, default output file is generated ( {inputfilename}_results.csv).
-
-##### output csv file sample
+##### Output csv file: 
+    optional (defaults to *{inputfilename}_results.csv*)
+    ** In absence of an output filename on CLI, default output file is generated.
+###### output csv file sample
 ![Sample_output](./resources/Sample_output.PNG)
 
-#### Linux exe:
+## Usage :
+##### Linux exe:
 ###### Display usage help:
 
 ```bash
@@ -68,22 +78,23 @@ Requires input csv file
 ![linux_execute](./resources/linux_execute.png)
 
 
-#### using Windows exe:
-Display usage help:
+##### Windows exe:
+###### Display usage help:
 ``` dos
 image_compare -h
 ```
 ![windows_help](./resources/windows_help.png)
-Display utility version:
+###### Display utility version:
 ```dos
 image_compare -v
 ```
 ![windows_help_VERSION](./resources/windows_version.png)
-Prcoess image comparison:
+###### Prcoess image comparison:
 ```dos
 image_compare -i <input csv file> -o <output csv file> *Optional*
 ```
 ![windows_help_exec](./resources/windows_execution.png)
+
 
 #### Python script ( Linux/macOS ):
 ###### Display usage help:
