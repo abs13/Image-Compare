@@ -139,13 +139,14 @@ def main(): #Function to generate the menu for the utility
     processCompare(csvtoread,outcsvfile,verbosity) #Call the function to compare the file sets based on the paths provided in input csv file
 def processCompare(csvtoread,outcsvfile,verbosity):
     ''' 
-        Takes two inputs, the input and output csv files. Loops over all lines in input csv and processes hash diffs.
+        Takes three inputs, the input and output csv files and verbosity . Loops over all lines in input csv and processes hash diffs.
 
         Calls the hash calculation function after making sure all I/O operations( permission and DISK space etc) are possible
 
             parameters:
                 a (str) :  path to input csv
                 b (str) :  path to output csv
+                c (str) : verbosity as TRUE / FALSE
             returns:
                     : nothing
     '''
@@ -153,7 +154,7 @@ def processCompare(csvtoread,outcsvfile,verbosity):
     my_platform = getOSType() # get the OS type
 
     try:
-        outputfile = open(outcsvfile , 'a') # check if output file can be opened for inserting new records ( in append mode )
+        outputfile = open(outcsvfile , 'a', newline='') # check if output file can be opened for inserting new records ( in append mode )
         headernames = ['Image1','Image2','Similar','Elapsed']
         writehandle = csv.DictWriter(outputfile,fieldnames=headernames)
         writehandle.writeheader()
