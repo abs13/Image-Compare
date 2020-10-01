@@ -14,7 +14,7 @@ The algorithm used was *phash*
 ### Pre-build exe files
 - Available for Windows 10, linux and macOS .
 - These can be found under individual directories under dist folder. 
-    ![distribution_dir_tree](resources/dist_dir_tree.PNG)
+![distribution_dir_tree](resources/dist_dir_tree.PNG)
 
 ##### Linux : 
 The utility has been tested on Centos 7, Centos 8 ,Ubuntu 20.04.1 LTS and Vagrant.
