@@ -5,6 +5,10 @@ The utility uses [imagehash](https://pypi.org/project/ImageHash/) module for cor
 Algorithm used was *phash* or perceptual hash.
 The perceptual hash of two images is calculated followed by the hamming distance.
 
+## Assumptions:
+    The users uses a OS specific input csv file with approriate root dir 
+    (e.g. windows paths begin with '<dirve name>:\' and linux/macOS paths begin with '/' )
+    If wrong platform paths are detected, the image files are considered to be missing and the comparison is skipped for the row
 
 ## Platform Support
 - The pre-built executable can be run on Windows 10, Linux and Mac OSX (Mojave and Catalina). 
