@@ -49,7 +49,7 @@ The tests folder contains:
 Available at [How To Guide](./Howto.md)
 
 ## Developer Documentation
-Available at [documentation](https://htmlpreview.github.io/?https://github.com/abs13/Image-Compare/blob/master/html/image_compare.html)
+Available at [dev-docs](https://htmlpreview.github.io/?https://github.com/abs13/Image-Compare/blob/master/html/image_compare.html)
 
 ## Contributing
 
