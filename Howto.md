@@ -1,9 +1,10 @@
+
 # <u> How To (Image Compare) </u>
 
-Image compare is a python script that reads an input csv file and can compares two images provided on each row. 
-The utility uses [imagehash](https://pypi.org/project/ImageHash/) module for core image comparison.
-Algorithm used was *phash* or perceptual hash.
-The perceptual hash of two images is calculated followed by the hamming distance.
+Image compare is a python script that reads an input csv file and compare two images provided on each row. 
+- The utility uses [imagehash](https://pypi.org/project/ImageHash/) module for core image comparison.
+- Algorithm used was *phash* or perceptual hash.
+- The perceptual hash of two images is calculated followed by the hamming distance.
 
 ## Assumptions:
     The users uses a OS specific input csv file with approriate root dir 
