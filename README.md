@@ -2,11 +2,11 @@
 
 Image compare is a python script that reads an input csv file and can compare two images provided on each row. 
 The utility uses [imagehash](https://pypi.org/project/ImageHash/) module for core image comparison.
-The algorithm used was *phash* or perceptual hash.
-A perceptual hash of two images is calculated followed by finding the hamming distance between these hashes.
+The algorithm used was [p-hash](https://www.phash.org/docs/howto.html) or perceptual hash.
+A perceptual hash of two images is calculated followed by finding the [hamming distance](https://en.wikipedia.org/wiki/Hamming_distance) between these hashes.
 
 ## Walkthrough 
-- On running the script, program captures the arguments passed to the script
+- On running the script, the program/utility captures the arguments passed to the script
   - -h (optional) displays the usage
   - -v (optional) displays the function
   - -o (optional) capture the output filename with path.
@@ -19,8 +19,8 @@ A perceptual hash of two images is calculated followed by finding the hamming di
 - The backuponRerun() then passed control back to main()
 - The function main() then calls processCompare()
 -  processCompare() takes three inputs.
-      -  Inputfile
-      -  Outputfile
+      -  Input file
+      -  Output file
       -  Verbosity (how descriptive the output for thrown exceptions should be)
 - processcompare() calls a function getOSType() to display what Operating system the program is being executed on
 - It checks if output file can be appended to. If not, an appropriate exception is raised. 
@@ -33,7 +33,7 @@ A perceptual hash of two images is calculated followed by finding the hamming di
     - The call to hamming distance is wrapped inside timeit() to calculate the execution cost of each image set
     - The hamming distacne is executed with a run_number of 100 to get the average execution cost.
     - This calculated hamming distance and the execution cost are then passed back to processcompare()
-- processcompare() then appends the *imagefile1*,*imagefile2*,*hamming* distance, *avg cost of execution* to the output file
+- processcompare() then appends the list [*imagefile1*,*imagefile2*,*hamming* distance, *avg cost of execution*] to the output file
 - The process is repeated for each line in the csv file
 - Once processing of the input file is complete, the output file is closed and control returned to command prompt.
   
