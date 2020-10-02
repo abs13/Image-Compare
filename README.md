@@ -1,138 +1,55 @@
 # Image-Compare
 
-Image comapre is a python script that reads an input csv file and can compares two images provided on each row. 
+Image compare is a python script that reads an input csv file and can compare two images provided on each row. 
 The utility uses [imagehash](https://pypi.org/project/ImageHash/) module for core image comparison.
-The algorithm used was *phash*
-> The utility is re-runable creating a backup of previous output files in <filename>_YYYY_MM_DD_H_M_S.csv format
+The algorithm used was *phash* or perceptual hash.
+A perceptual hash of two images is calculated followed by finding the hamming distance between these hashes.
 
-## Platform Support
-- The pre-built executable can be run on Windows 10, linux and Mac OSX ( Mojave and Catalina). 
+## Walkthrough 
+- On running the script, program captures the arguments passed to the script
+  - -h (optional) displays the usage
+  - -v (optional) displays the function
+  - -o (optional) capture the output filename with path.
+  - -i (required) captures the input csv filename with path
+  - -i represent the input file absolute path and is mandator
+      - if no input is provides, the code throws an error and displays usage
+      - if no output file is provides, default output filename, same as *input-file*_results.csv is assigned
+- The main() function then calls backuponRerun()
+- The backuponRerun() function, examines the input file and if a file with *input-file*_results.csv exists, renames it to *input-file*_results_*YYYY_DD_MM_H_M_S*.csv
+- The backuponRerun() then passed control back to main()
+- The function main() then calls processCompare()
+-  processCompare() takes three inputs.
+      -  Inputfile
+      -  Outputfile
+      -  Verbosity (how descriptive the output for thrown exceptions should be)
+- processcompare() calls a function getOSType() to display what Operating system the program is being executed on
+- It checks if output file can be appended to. If not, an appropriate exception is raised. 
+- If no exceptions are thrown while opening output file for insertion of records, the code checks if the input file exists and is not empty
+    - If input file exists and is empty, exception is raised that the input file is empty and execution halted
+    - If the input file does not exist, exception is thrown that the file does not exist and execution halted
+    - If the input file exists and is not empty, the input file is read line by line in a loop.
+    - For each iteration, the two images are passed to a function getimagehash()
+    - getimagehash() will calculate a perceptual hash of each image and then calculate the [*hamming distance*](https://en.wikipedia.org/wiki/Hamming_distance)
+    - The call to hamming distance is wrapped inside timeit() to calculate the execution cost of each image set
+    - The hamming distacne is executed with a run_number of 100 to get the average execution cost.
+    - This calculated hamming distance and the execution cost are then passed back to processcompare()
+- processcompare() then appends the *imagefile1*,*imagefile2*,*hamming* distance, *avg cost of execution* to the output file
+- The process is repeated for each line in the csv file
+- Once processing of the input file is complete, the output file is closed and control returned to command prompt.
+  
+## Testing scenarios and test data
+Details about testing scenarios can be found [here](./Test%20Strategy.md)
+##### The 'tests' folder
+The tests folder contains:
+-  Test images
+-  Test csv files
+-  results for each scenario
 
-- For other platforms, use the python script *image_compare.py*
-## Distributions:
-
-### Pre-build exe files
-- Available for Windows 10, linux and macOS .
-- These can be found under individual directories under dist folder. 
-
-![distribution_dir_tree](resources/dist_dir_tree.PNG)
-
-##### Linux : 
-The utility has been tested on Centos 7, Centos 8 ,Ubuntu 20.04.1 LTS and Vagrant.
-
-[linux](dist/linux/image_compare)
-##### Windows : 
-The utility has been tested on windows 10
-
-[windows](dist/windows/image_compare.exe)
-##### macOS :
-macOS support has been tested on Mojave and Catalina . 
-The distribution has been code-signed using self generated certificates.
-
-[macOS](dirs/../dist/mac/image_compare)
-
-###  Python script setup
-The code base folder contains the *image_compare.py* python script 
-
-> To run as a python script, follow the instructions below.
-
-##### Pre-requisites:
-1. Python 3.5 or greater
-2. imagehash
-3. Pillow
-###### Check python version:
-``` python
-        python3 --version
-```
-###### Install python module dependencies using pip:
-Module dependencies are  bundled together in [requirments.txt](requirments.txt) and can be installed using 
-```python
-       python3 -m pip install -r requirments.txt
-```
-
-### Input parameters and Output file
-#### Input csv file: 
-    Required 
-###### Input csv file format
-
-![sample input](./resources/Sample_input.PNG)
-
-##### Output csv file: 
-    optional (defaults to *{inputfilename}_results.csv*)
-    ** In absence of an output filename on CLI, default output file is generated.
-###### output csv file sample
-![Sample_output](./resources/Sample_output.PNG)
-
-## Usage :
-##### Linux exe:
-###### Display usage help:
-
-```bash
-   ./image_compare -h
-```
-![linux_help](./resources/linux_help.png)
-###### Display the version information:
-```bash 
-    ./image_compare -v
-```
-![linux_help_version](./resources/linux_version.png)
-###### Execute image comparison :
-```bash
- ./image_comapre -i <input csv file> -o <output csv file> *(Optional)
-```
-![linux_execute](./resources/linux_execute.png)
-
-
-##### Windows exe:
-###### Display usage help:
-``` dos
-image_compare -h
-```
-![windows_help](./resources/windows_help.png)
-###### Display utility version:
-```dos
-image_compare -v
-```
-![windows_help_VERSION](./resources/windows_version.png)
-###### Prcoess image comparison:
-```dos
-image_compare -i <input csv file> -o <output csv file> *Optional*
-```
-![windows_help_exec](./resources/windows_execution.png)
-
-
-#### Python script ( Linux/macOS ):
-###### Display usage help:
-```bash
-   python image_compare.py -h
-```
-###### Display the version information:
-```bash 
-    python image_compare.py -v
-```
-###### Process image comparison :
-```bash
- python image_compare.py -i <input csv file> -o <output csv file> *(Optional)
-```
-
-#### using python scripts (Windows):
-```dos
-   python image_compare.py -h
-```
-Display the version information:
-```dos 
-    python image_compare.py -v
-```
-Process image comparison :
-```dos
- python image_compare.py -i <input csv file> -o <output csv file> *(Optional)
-```
-
+## How-To Guide:
+Available at [How To Guide](./Howto.md)
 
 ## Developer Documentation
-Developer documentation is availale at
-
-[documentation](https://htmlpreview.github.io/?https://github.com/abs13/Image-Compare/blob/master/html/image_compare.html)
+Available at [documentation](https://htmlpreview.github.io/?https://github.com/abs13/Image-Compare/blob/master/html/image_compare.html)
 
 ## Contributing
 
