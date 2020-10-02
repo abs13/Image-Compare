@@ -37,7 +37,7 @@ A perceptual hash of two images is calculated followed by finding the [hamming d
 - The process is repeated for each line in the csv file
 - Once processing of the input file is complete, the output file is closed and control returned to command prompt.
   
-## Testing scenarios and test data
+## Testing Scenarios and Test Data
 Details about testing scenarios can be found [here](./Test%20Strategy.md)
 ##### The 'tests' folder
 The tests folder contains:
